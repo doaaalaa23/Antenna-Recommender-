@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="app-title-key" data-key="title">Antenna Recommender - Smart Selection Guide</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Kufi+Arabic:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        theme: {
+                            base: '#fbfaf7',      // Main Background
+                            surface: '#ffffff',   // Cards
+                            header: '#dfd7e8',    // Lavender Accent
+                            primary: '#826099',   // Deep Purple
+                            primaryHover: '#6b4c7d',
+                            secondary: '#edcfb6', // Peach/Beige
+                            tertiary: '#ece8e0',  // Light Grayish
+                            input: '#f4f2ef',     // Input BG
+                            border: '#ebdacc',    // Borders
+                            text: '#1a1a1a',      // Dark Neutral Text
+                        }
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(130, 96, 153, 0.08)',
+                        'glow': '0 0 20px rgba(130, 96, 153, 0.25)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            transition: background-color 0.3s ease, color 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            background-color: #fbfaf7;
+            color: #1a1a1a;
+            -webkit-font-smoothing: antialiased;
+        }
+        [dir="rtl"] {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+        }
+        .fade-in {
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px) scale(0.99); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        /* Navigation Active State & Micro-interactions */
+        .nav-item {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .nav-item.active {
+            background-color: #826099;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px -2px rgba(130, 96, 153, 0.4);
+            transform: translateX(2px);
+        }
+        [dir="rtl"] .nav-item.active {
+            transform: translateX(-2px);
+        }
+
+        /* UI/UX Animations for Loader */
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes pulseGlow { 0%, 100% { opacity: 1; filter: drop-shadow(0 0 8px rgba(130,96,153,0.5)); } 50% { opacity: 0.6; filter: drop-shadow(0 0 2px rgba(130,96,153,0.2)); } }
+        .engaging-loader-icon .rotating-element { animation: spin 1.2s linear infinite; transform-origin: center; }
+        .engaging-loader-icon { animation: pulseGlow 1.5s infinite ease-in-out; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #fbfaf7; }
+        ::-webkit-scrollbar-thumb { background: #ebdacc; border-radius: 99px; }
+        ::-webkit-scrollbar-thumb:hover { background: #826099; }
+
+        select:disabled { background-color: #ece8e0; color: #9ca3af; cursor: not-allowed; border-color: #dfd7e8; }
+        
+        /* Glassmorphism Effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+
+<body class="h-screen flex overflow-hidden bg-[#fbfaf7] text-gray-900 selection:bg-[#dfd7e8] selection:text-[#826099]">
+
+    <!-- SIDEBAR -->
+    <aside id="app-sidebar" class="w-72 bg-white/80 backdrop-blur-md border-r border-[#ebdacc] flex flex-col justify-between hidden md:flex shrink-0 transition-all duration-300 z-30">
+        <div>
+            <!-- Sidebar Header / Logo -->
+            <div class="p-6 flex items-center gap-3.5 border-b border-[#f4f2ef]">
+                <div class="bg-gradient-to-br from-[#826099] to-[#6b4c7d] p-2.5 rounded-2xl shadow-md text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg text-[#1a1a1a] tracking-tight leading-none">Antenna</h1>
+                    <span class="text-xs font-semibold text-[#826099] tracking-widest uppercase">Recommender</span>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="p-4 space-y-1.5 mt-2">
+                <button id="nav-overview" onclick="showSection('overview')" class="nav-item active w-full flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                    <span data-key="nav_overview">Overview</span>
+                </button>
+                
+                <div class="px-4 pt-5 pb-2 text-[11px] font-bold text-gray-400 uppercase tracking-wider" data-key="nav_app_header">Application</div>
+                
+                <button id="nav-recommender" onclick="showSection('recommender')" class="nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-xl font-semibold text-sm text-gray-600 hover:bg-[#f4f2ef] text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span data-key="nav_live">Live Recommender</span>
+                </button>
+            </nav>
+
+            <!-- Quick RF Reference Card (Sidebar - VHF / UHF / SHF coverage) -->
+            <div class="p-4 mx-3 my-2 bg-gradient-to-br from-[#dfd7e8]/40 to-[#ece8e0]/60 rounded-2xl border border-[#ebdacc] shadow-sm">
+                <div class="flex items-center gap-2 mb-2 text-[#826099]">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span class="font-extrabold text-xs tracking-tight" data-key="sidebar_tip_title">RF Quick Reference</span>
+                </div>
+                <div class="space-y-2 text-[11px] text-gray-700">
+                    <div class="p-2 bg-white/70 rounded-xl border border-[#ebdacc]/80">
+                        <span class="font-bold text-[#826099] block">VHF (30-300 MHz)</span>
+                        <p class="text-gray-600 text-[10px] leading-tight mt-0.5" data-key="sidebar_tip_vhf">Long range, obstacles diffraction, FM & Two-Way Radio.</p>
+                    </div>
+                    <div class="p-2 bg-white/70 rounded-xl border border-[#ebdacc]/80">
+                        <span class="font-bold text-[#826099] block">UHF (300 MHz-3 GHz)</span>
+                        <p class="text-gray-600 text-[10px] leading-tight mt-0.5" data-key="sidebar_tip_uhf">Balanced penetration, Cellular 4G/5G, WiFi & GPS.</p>
+                    </div>
+                    <div class="p-2 bg-white/70 rounded-xl border border-[#ebdacc]/80">
+                        <span class="font-bold text-[#826099] block">SHF (3-30 GHz)</span>
+                        <p class="text-gray-600 text-[10px] leading-tight mt-0.5" data-key="sidebar_tip_shf">High bandwidth, line-of-sight Satellite & Microwave links.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Sponsor Text Line -->
+        <div class="p-4 text-center border-t border-[#ebdacc]/60">
+            <p class="text-xs text-gray-500 font-medium">
+                <span data-key="sponsored_by">Sponsored by</span> <span class="font-bold text-[#826099]">Randa Fouad</span>
+            </p>
+        </div>
+    </aside>
+
+    <!-- MOBILE HEADER -->
+    <div class="md:hidden fixed top-0 w-full bg-white/90 backdrop-blur-md z-40 border-b border-[#ebdacc] px-4 py-3 flex justify-between items-center shadow-sm">
+        <div class="flex items-center gap-2.5">
+            <div class="bg-[#826099] p-2 rounded-xl text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0" /></svg>
+            </div>
+            <span class="font-bold text-sm">Antenna Rec.</span>
+        </div>
+        <button onclick="toggleMobileMenu()" class="p-2 text-[#826099] rounded-xl hover:bg-[#f4f2ef]">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+        </button>
+    </div>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+        
+        <!-- Top Header Bar -->
+        <header class="bg-white/60 backdrop-blur-md border-b border-[#ebdacc]/60 px-6 md:px-10 py-4 flex justify-between items-center shrink-0 mt-14 md:mt-0 z-20">
+            <h2 class="text-base md:text-lg font-bold text-[#826099] hidden sm:block tracking-tight" data-key="header_tagline">Your smart guide to optimal antenna selection</h2>
+            
+            <div class="flex items-center gap-3 shrink-0">
+                <!-- API Key Config Button -->
+                <button onclick="openApiKeyModal()" class="p-2 text-gray-500 hover:text-[#826099] hover:bg-[#f4f2ef] rounded-xl transition border border-[#ebdacc]" title="Gemini API Settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </button>
+
+                <!-- Language Toggle Button -->
+                <button
+                    id="lang-toggle-button"
+                    class="flex items-center gap-2 px-4 py-2 font-bold text-xs rounded-xl text-white bg-gradient-to-r from-[#826099] to-[#6b4c7d] hover:shadow-md transition duration-200 transform active:scale-95"
+                    onclick="toggleLanguage()"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>
+                    <span id="button-text-toggle">التبديل إلى العربية</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- SCROLLABLE CONTENT -->
+        <div class="flex-1 overflow-y-auto px-4 md:px-10 py-6 pb-24">
+            
+            <!-- VIEW 1: OVERVIEW (Default) -->
+            <div id="overview-section" class="max-w-5xl mx-auto fade-in">
+                <!-- Hero Card -->
+                <div class="w-full bg-gradient-to-br from-[#826099] via-[#75538c] to-[#59396c] rounded-[2.5rem] p-8 md:p-14 text-white shadow-xl relative overflow-hidden mb-10 border border-white/10">
+                    <div class="absolute -right-10 -bottom-10 w-96 h-96 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
+                    
+                    <div class="relative z-10 max-w-2xl">
+                        <h1 class="text-3xl md:text-5xl font-black mb-4 leading-tight tracking-tight pt-2">Antenna Recommender</h1>
+                        <p class="text-base md:text-lg text-white/85 leading-relaxed max-w-lg mb-8" data-key="overview_desc">
+                            A data-driven web application guiding users to the optimal antenna configuration for their technical requirements.
+                        </p>
+                        
+                        <button onclick="showSection('recommender')" class="bg-white text-[#826099] font-extrabold text-sm py-3.5 px-8 rounded-full hover:bg-[#fbfaf7] shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5 active:translate-y-0 inline-flex items-center gap-2.5">
+                            <span data-key="start_now">Start Recommendation</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                        </button>
+                    </div>
+
+                    <div class="hidden lg:block absolute right-12 bottom-6 text-white/15 pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-64 w-64" viewBox="0 0 24 24" fill="currentColor">
+                           <path d="M12 2L2 22h20L12 2zm0 3.5l6.5 13.5h-13L12 5.5z"/>
+                           <path d="M12 6l-1 2h2l-1-2zM12 9l-2 4h4l-2-4z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Info Features Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-[#ebdacc] hover:border-[#826099]/40 transition duration-300">
+                        <div class="bg-[#f4f2ef] w-12 h-12 rounded-2xl flex items-center justify-center mb-4 text-[#826099] shadow-inner">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
+                        </div>
+                        <h3 class="font-bold text-base mb-1.5" data-key="feature_1_title">AI Analysis</h3>
+                        <p class="text-xs text-gray-500 leading-relaxed" data-key="feature_1_desc">Advanced algorithms to interpret your project needs into technical specs.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-[#ebdacc] hover:border-[#826099]/40 transition duration-300">
+                        <div class="bg-[#f4f2ef] w-12 h-12 rounded-2xl flex items-center justify-center mb-4 text-[#826099] shadow-inner">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <h3 class="font-bold text-base mb-1.5" data-key="feature_2_title">Precise Matching</h3>
+                        <p class="text-xs text-gray-500 leading-relaxed" data-key="feature_2_desc">Filters for frequency, polarization, and application to find the perfect fit.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-[#ebdacc] hover:border-[#826099]/40 transition duration-300">
+                        <div class="bg-[#f4f2ef] w-12 h-12 rounded-2xl flex items-center justify-center mb-4 text-[#826099] shadow-inner">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                        </div>
+                        <h3 class="font-bold text-base mb-1.5" data-key="feature_3_title">Installation Guides</h3>
+                        <p class="text-xs text-gray-500 leading-relaxed" data-key="feature_3_desc">Step-by-step AI generated guides for installing your selected antenna.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 2: LIVE RECOMMENDER -->
+            <div id="recommender-section" class="max-w-6xl mx-auto hidden fade-in">
+                
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl md:text-4xl font-extrabold text-[#826099] mb-2 tracking-tight" data-key="main_heading">Find Your Ideal Antenna Setup</h2>
+                    <p class="text-gray-500 text-sm font-medium" data-key="main_paragraph">Select your criteria, or describe your project using our AI Analyzer.</p>
+                </div>
+
+                <!-- AI PROJECT ANALYZER BOX -->
+                <div class="mb-10 p-6 rounded-3xl bg-white border border-[#ebdacc] shadow-sm relative overflow-hidden">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="p-2 bg-[#dfd7e8]/50 rounded-xl text-[#826099]">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-[#826099]" data-key="ai_analyzer_title">AI Project Analyzer</h3>
+                    </div>
+                    
+                    <p class="text-gray-500 text-xs mb-3" data-key="ai_analyzer_prompt">Describe your goal (e.g., 'Long-range point-to-point link in a remote area, 10km,' or 'Small, hidden antenna for a smart home device').</p>
+                    
+                    <textarea id="projectAnalyzerInput" rows="3" class="w-full p-4 rounded-2xl bg-[#f4f2ef] border border-[#ebdacc] text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#826099]/50 focus:border-[#826099] transition shadow-inner" data-key="ai_analyzer_placeholder" placeholder="Enter your project description here..."></textarea>
+                    
+                    <div class="flex flex-wrap items-center justify-between gap-4 mt-4">
+                        <button id="analyzeProjectBtn" class="bg-[#826099] hover:bg-[#6b4c7d] text-white font-extrabold text-xs py-3.5 px-8 rounded-xl transition shadow-md hover:shadow-lg flex items-center justify-center gap-2 active:scale-95">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                            <span data-key="ai_analyze_btn">Analyze My Project</span>
+                        </button>
+
+                        <div id="analyzeLoader" class="hidden items-center gap-2 text-xs font-semibold text-[#826099]">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 engaging-loader-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="9" stroke="#dfd7e8" stroke-width="3"/>
+                                <path d="M12 3a9 9 0 019 9" stroke="#826099" stroke-width="3" stroke-linecap="round" class="rotating-element"/>
+                            </svg>
+                            <span>Analyzing specifications with AI...</span>
+                        </div>
+                    </div>
+
+                    <div id="analyzeFeedback" class="mt-4 p-4 bg-[#fbfaf7] rounded-xl border border-[#ebdacc] text-xs text-gray-800 shadow-sm hidden"></div>
+                </div>
+
+                <!-- Input Controls Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <!-- Frequency -->
+                    <div class="bg-white p-4 rounded-2xl border border-[#ebdacc] shadow-sm">
+                        <label for="frequency" class="block text-xs font-bold text-[#826099] uppercase tracking-wider mb-2 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            <span data-key="frequency_label">Frequency Range</span>
+                        </label>
+                        <select id="frequency" class="w-full p-3 border border-[#ebdacc] rounded-xl bg-[#f4f2ef] text-xs text-gray-900 font-semibold focus:outline-none focus:ring-2 focus:ring-[#826099] cursor-pointer appearance-none"></select>
+                    </div>
+
+                    <!-- Application -->
+                    <div class="bg-white p-4 rounded-2xl border border-[#ebdacc] shadow-sm">
+                        <label for="application" class="block text-xs font-bold text-[#826099] uppercase tracking-wider mb-2 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m6 2l-4 4m0-4l4 4m6 7l-4-4m0 4l4-4"/></svg>
+                            <span data-key="application_label">Primary Application</span>
+                        </label>
+                        <select id="application" class="w-full p-3 border border-[#ebdacc] rounded-xl bg-[#f4f2ef] text-xs text-gray-900 font-semibold focus:outline-none focus:ring-2 focus:ring-[#826099] cursor-pointer appearance-none" disabled></select>
+                    </div>
+
+                    <!-- Polarization -->
+                    <div class="bg-white p-4 rounded-2xl border border-[#ebdacc] shadow-sm">
+                        <label for="polarization" class="block text-xs font-bold text-[#826099] uppercase tracking-wider mb-2 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span data-key="polarization_label">Polarization Type</span>
+                        </label>
+                        <select id="polarization" class="w-full p-3 border border-[#ebdacc] rounded-xl bg-[#f4f2ef] text-xs text-gray-900 font-semibold focus:outline-none focus:ring-2 focus:ring-[#826099] cursor-pointer appearance-none"></select>
+                    </div>
+
+                    <!-- Coverage Pattern -->
+                    <div class="bg-white p-4 rounded-2xl border border-[#ebdacc] shadow-sm">
+                        <label for="coveragePattern" class="block text-xs font-bold text-[#826099] uppercase tracking-wider mb-2 flex items-center gap-2">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V8a4 4 0 014-4h2a4 4 0 014 4v8m-11 0h14m-14 0l1.5-4H20l1.5 4M12 12h.01"/></svg>
+                            <span data-key="coverage_label">Coverage Pattern</span>
+                        </label>
+                        <select id="coveragePattern" class="w-full p-3 border border-[#ebdacc] rounded-xl bg-[#f4f2ef] text-xs text-gray-900 font-semibold focus:outline-none focus:ring-2 focus:ring-[#826099] cursor-pointer appearance-none"></select>
+                    </div>
+
+                    <!-- Installation Type -->
+                    <div class="bg-white p-4 rounded-2xl border border-[#ebdacc] shadow-sm sm:col-span-2 lg:col-span-2">
+                        <label for="installationType" class="block text-xs font-bold text-[#826099] uppercase tracking-wider mb-2 flex items-center gap-2">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0a2 2 0 012-2h6a2 2 0 012 2M7 7h10"/></svg>
+                            <span data-key="installation_label">Installation Type</span>
+                        </label>
+                        <select id="installationType" class="w-full p-3 border border-[#ebdacc] rounded-xl bg-[#f4f2ef] text-xs text-gray-900 font-semibold focus:outline-none focus:ring-2 focus:ring-[#826099] cursor-pointer appearance-none"></select>
+                    </div>
+                </div>
+
+                <!-- Find Button -->
+                <div class="text-center mt-6">
+                     <button id="findAntennaBtn" class="bg-gradient-to-r from-[#826099] to-[#6b4c7d] hover:from-[#6b4c7d] hover:to-[#59396c] text-white font-extrabold text-sm py-4 px-12 rounded-full transition duration-300 transform hover:scale-105 shadow-xl hover:shadow-[#826099]/30 inline-flex items-center justify-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <span data-key="find_btn">Find My Antenna Now</span>
+                    </button>
+                </div>
+
+                <!-- Results Section Container -->
+                <div id="results" class="mt-12"></div>
+            </div>
+            
+            <!-- Footer -->
+            <footer class="mt-20 py-6 text-center text-gray-400 text-xs border-t border-[#ebdacc]">
+                <p data-key="footer">&copy; 2026 Communications Tech & Recommender Team. All rights reserved.</p>
+                <p class="mt-1.5 text-gray-500"><span data-key="sponsored_by">Sponsored by</span> <span class="font-semibold text-gray-700">Randa Fouad</span></p>
+            </footer>
+        </div>
+    </main>
+
+    <!-- API KEY MODAL -->
+    <div id="apiKeyModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-[#ebdacc] fade-in">
+            <h3 class="text-lg font-bold text-[#826099] mb-2">Gemini API Key Configuration</h3>
+            <p class="text-xs text-gray-500 mb-4">Enter a valid Gemini API Key for live AI generation, or leave empty to use built-in smart simulation mode.</p>
+            <input type="password" id="customApiKeyInput" placeholder="AIzaSy..." class="w-full p-3 rounded-xl bg-[#f4f2ef] border border-[#ebdacc] text-xs mb-4 focus:ring-2 focus:ring-[#826099] outline-none">
+            <div class="flex justify-end gap-2">
+                <button onclick="closeApiKeyModal()" class="px-4 py-2 text-xs font-bold text-gray-500 hover:bg-[#f4f2ef] rounded-xl">Cancel</button>
+                <button onclick="saveApiKey()" class="px-5 py-2 text-xs font-bold text-white bg-[#826099] hover:bg-[#6b4c7d] rounded-xl shadow">Save Key</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Navigation Logic ---
+        function showSection(sectionId) {
+            document.getElementById('overview-section').classList.add('hidden');
+            document.getElementById('recommender-section').classList.add('hidden');
+            
+            document.getElementById(sectionId + '-section').classList.remove('hidden');
+            
+            document.getElementById('nav-overview').classList.remove('active');
+            document.getElementById('nav-recommender').classList.remove('active');
+            
+            document.getElementById('nav-' + sectionId).classList.add('active');
+
+            // Close mobile menu if open
+            const sidebar = document.getElementById('app-sidebar');
+            if (sidebar.classList.contains('absolute')) {
+                toggleMobileMenu();
+            }
+        }
+
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('app-sidebar');
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('absolute');
+            sidebar.classList.toggle('inset-y-0');
+            sidebar.classList.toggle('left-0');
+            sidebar.classList.toggle('shadow-2xl');
+        }
+
+        // --- Translation & Dictionary ---
+        const translations = {
+            ar: {
+                title: "مستشار الهوائيات الاحترافي - دليل الاختيار الذكي",
+                nav_overview: "نظرة عامة",
+                nav_app_header: "التطبيق",
+                nav_live: "المستشار المباشر",
+                sponsored_by: "برعاية",
+                sidebar_tip_title: "مرجع هندسي للترددات",
+                sidebar_tip_vhf: "تغطية واسعة، حيود ممتاز للحواجز، اتصالات لاسلكية وبث FM.",
+                sidebar_tip_uhf: "توازن عالي للاختراق، شبكات 4G/5G الخلوية، الـ WiFi و GPS.",
+                sidebar_tip_shf: "نطاق عالي لنقل البيانات، أقمار صناعية وروابط ميكروويف متباشرة.",
+                header_tagline: "دليلك الذكي لاختيار الهوائي الأمثل لمتطلباتك التقنية",
+                overview_desc: "تطبيق ويب متقدم يستند إلى البيانات لمساعدة المهندسين والمصممين في اختيار الهوائي الأمثل ودراسة خصائصه الإشعاعية.",
+                start_now: "ابدأ التوصية الآن",
+                feature_1_title: "تحليل الذكاء الاصطناعي",
+                feature_1_desc: "خوارزميات ذكية لتفكيك وصف مشروعك وتحويله إلى مواصفات هرتزية واستقطابية دقيقة.",
+                feature_2_title: "مطابقة عالية الدقة",
+                feature_2_desc: "تصفية فورية حسب التردد، الاستقطاب، نمط الإشعاع وبيئة التثبيت بكفاءة عالية.",
+                feature_3_title: "أدلة تركيب تفاعلية",
+                feature_3_desc: "توليد أدلة تثبيت وااحتياطات سلامة مفصلة لكل هوائي بواسطة نموذج Gemini AI.",
+                lang_toggle_btn: "Switch to English",
+                main_heading: "ابحث عن إعداد الهوائي المثالي لمشروعك",
+                main_paragraph: "حدد معايير البحث المباشرة، أو صف مشروعك باللغة الطبيعية ليقوم الذكاء الاصطناعي بالتحليل.",
+                ai_analyzer_title: "محلل المشاريع بالذكاء الاصطناعي (Gemini AI)",
+                ai_analyzer_prompt: "صف هدفك الهندسي (مثال: 'ربط لاسلكي لنقطتين يبعدان 15 كم في منطقة نائية' أو 'هوائي مدمج صغير لجهاز إنترنت الأشياء').",
+                ai_analyzer_placeholder: "اكتب وصف مشروعك الهندسي هنا...",
+                ai_analyze_btn: "تحليل معايير المشروع",
+                frequency_label: "نطاق التردد (Frequency Band)",
+                freq_option_any: "أي تردد (All Bands)",
+                freq_lf: "LF (30-300 kHz) - موجات طويلة وملاحة",
+                freq_mf: "MF (300 kHz - 3 MHz) - بث AM وسفن",
+                freq_hf: "HF (3-30 MHz) - موجات قصيرة لاتصالات دولية",
+                freq_vhf: "VHF (30-300 MHz) - راديو FM واتصالات طيران",
+                freq_uhf: "UHF (300 MHz - 3 GHz) - شبكات خلوية، WiFi و GPS",
+                freq_shf: "SHF (3-30 GHz) - أقمار صناعية وميكروويف",
+                application_label: "التطبيق الأساسي (Primary Application)",
+                app_option_select_first: "اختر نطاق التردد أولاً",
+                app_option_any: "أي تطبيق في هذا النطاق",
+                polarization_label: "نوع الاستقطاب (Polarization)",
+                polarization_option_any: "أي استقطاب",
+                polarization_linear: "خطي (Linear - Vertical/Horizontal)",
+                polarization_circular: "دائري (Circular - RHCP/LHCP)",
+                coverage_label: "نمط التغطية (Coverage Pattern)",
+                coverage_option_any: "أي نمط إشعاعي",
+                coverage_omni: "متعدد الاتجاهات (Omnidirectional 360°)",
+                coverage_directional: "اتجاهي مُركز (Directional High-Gain)",
+                installation_label: "بيئة التركيب (Installation Environment)",
+                installation_option_any: "أي بيئة تركيب",
+                installation_fixed: "ثابت خارجي (أبراج/أسطح المباني)",
+                installation_mobile: "متحرك / محمول (مركبات/أجهزة يدوية)",
+                installation_embedded: "مدمج داخلي (شرائح IoT / أجهزة ذكية)",
+                find_btn: "استعراض الهوائيات المطابقة",
+                footer: "© 2026 جميع الحقوق محفوظة - فريق هوائي المستشار الذكي.",
+                results_title_single: "الهوائي الموصى به هندسياً",
+                results_title_multiple: "أنواع الهوائيات المطابقة للمواصفات",
+                results_no_match_heading: "لم نجد مطابقة معيارية 100%", 
+                results_no_match_text: "نقترح توسيع خيارات الفلاتر. تم عرض هوائيات عالمية عامة الاستخدام كمرجع مبدئي لمشروعك:", 
+                section_advantages: "المزايا التقنية",
+                section_disadvantages: "القيود والتحديات",
+                ai_guide_btn: "توليد دليل التثبيت والتركيب (AI Guide)",
+                ai_guide_btn_hide: "إخفاء دليل التثبيت",
+                ai_guide_generating: "جارٍ التواصل مع الذكاء الاصطناعي...",
+                analysis_complete: "تم تحليل المشكلات بنجاح وتحديث الفلاتر تلقائياً!",
+                analysis_fail: "لم نتمكن من تحليل النص بدقة. تم تفعيل خيارات التصفية الافتراضية.",
+                analysis_enter_desc: "يرجى كتابة وصف تقني لمشروعك أولاً ليتمكن الذكاء الاصطناعي من تحليله.",
+                analysis_label_freq: "التردد المقترح:",
+                analysis_label_app: "التطبيق المقترح:",
+                analysis_label_polar: "الاستقطاب المقترح:",
+                analysis_label_coverage: "نمط التغطية:",
+                analysis_label_install: "بيئة التركيب:",
+            },
+            en: {
+                title: "Professional Antenna Recommender - Smart Selection Guide",
+                nav_overview: "Overview",
+                nav_app_header: "Application",
+                nav_live: "Live Recommender",
+                sponsored_by: "Sponsored by",
+                sidebar_tip_title: "RF Quick Reference",
+                sidebar_tip_vhf: "Long range, obstacles diffraction, FM & Two-Way Radio.",
+                sidebar_tip_uhf: "Balanced penetration, Cellular 4G/5G, WiFi & GPS.",
+                sidebar_tip_shf: "High bandwidth, line-of-sight Satellite & Microwave links.",
+                header_tagline: "Your smart guide to optimal antenna selection",
+                overview_desc: "A data-driven web application guiding users to the optimal antenna configuration for their technical requirements.",
+                start_now: "Start Recommendation",
+                feature_1_title: "AI Analysis",
+                feature_1_desc: "Advanced algorithms to interpret your project needs into technical specs.",
+                feature_2_title: "Precise Matching",
+                feature_2_desc: "Filters for frequency, polarization, and application to find the perfect fit.",
+                feature_3_title: "Installation Guides",
+                feature_3_desc: "Step-by-step AI generated guides for installing your selected antenna.",
+                lang_toggle_btn: "التبديل إلى العربية",
+                main_heading: "Find Your Ideal Antenna Setup",
+                main_paragraph: "Select your criteria, or describe your project using our AI Analyzer.",
+                ai_analyzer_title: "AI Project Analyzer (Gemini AI)",
+                ai_analyzer_prompt: "Describe your goal (e.g., 'Long-range point-to-point link in a remote area, 10km,' or 'Small, hidden antenna for a smart home device').",
+                ai_analyzer_placeholder: "Enter your project description here...",
+                ai_analyze_btn: "Analyze My Project",
+                frequency_label: "Frequency Range",
+                freq_option_any: "Any Frequency (All Bands)",
+                freq_lf: "LF (30-300 kHz) - Navigation & Long Wave",
+                freq_mf: "MF (300 kHz - 3 MHz) - AM Broadcasting & Maritime Safety",
+                freq_hf: "HF (3-30 MHz) - Shortwave & Global Distance Communication",
+                freq_vhf: "VHF (30-300 MHz) - Local FM/TV & Two-Way Radio",
+                freq_uhf: "UHF (300 MHz - 3 GHz) - Cellular, WiFi, TV, and GPS",
+                freq_shf: "SHF (3-30 GHz) - Satellite Communication & Microwave Links",
+                application_label: "Primary Application",
+                app_option_select_first: "Select Frequency First",
+                app_option_any: "Any Application for this band",
+                polarization_label: "Polarization Type",
+                polarization_option_any: "Any Polarization",
+                polarization_linear: "Linear (Horizontal/Vertical)",
+                polarization_circular: "Circular (RHCP/LHCP)",
+                coverage_label: "Coverage Pattern",
+                coverage_option_any: "Any Pattern",
+                coverage_omni: "Omnidirectional (360° Coverage)",
+                coverage_directional: "Directional (Focused Beam/High Gain)",
+                installation_label: "Installation Type",
+                installation_option_any: "Any Installation",
+                installation_fixed: "Fixed Outdoor (Tower/Roof)",
+                installation_mobile: "Mobile / Portable (Vehicles/Handheld)",
+                installation_embedded: "Indoor / Embedded (IoT/Devices)",
+                find_btn: "Find My Antenna Now",
+                footer: "© 2026 All rights reserved - Antenna Recommender Team.",
+                results_title_single: "Recommended Antenna",
+                results_title_multiple: "Suitable Antenna Types",
+                results_no_match_heading: "No Specific Match Found",
+                results_no_match_text: "Try broadening your search criteria. General purpose antennas are shown below for baseline comparison:",
+                section_advantages: "Advantages",
+                section_disadvantages: "Disadvantages",
+                ai_guide_btn: "Get AI Installation Guide",
+                ai_guide_btn_hide: "Hide Installation Guide",
+                ai_guide_generating: "Connecting to AI...",
+                analysis_complete: "Analysis Complete! Filters Updated.",
+                analysis_fail: "Failed to analyze the project. Default parameters applied.",
+                analysis_enter_desc: "Please enter a description of your project first.",
+                analysis_label_freq: "Suggested Frequency:",
+                analysis_label_app: "Suggested Application:",
+                analysis_label_polar: "Suggested Polarization:",
+                analysis_label_coverage: "Suggested Coverage:",
+                analysis_label_install: "Suggested Installation:",
+            }
+        };
+
+        // --- Dataset ---
+        const antennaData = [
+            {
+                name: {ar: "هوائي ثنائي القطب (Dipole)", en: "Dipole Antenna"},
+                id: "dipole", 
+                image: "https://www.ariat-tech.com/upfile/images/f3/20240902170029730.jpg",
+                description: {
+                    ar: "أحد أهم الهوائيات الأساسية في الهندسة اللاسلكية. يتكون من موصلين متطابقين بحجم ربع موجه (Quarter-Wave) ويعتبر المعيار المرجعي للكسب الإشعاعي (dBd).", 
+                    en: "One of the most foundational resonant antennas. Consists of two identical conductive elements and serves as the standard gain reference (dBd)."
+                },
+                advantages: {
+                    ar: ["سهل التصميم والتصنيع ومنخفض التكلفة", "كفاءة إشعاعية عالية واستجابة متوازنة", "مرجع أساسي لحساب قياسات الهوائيات المعقدة"], 
+                    en: ["Simple, cost-effective, and easy to construct", "High radiation efficiency with balanced feed", "Fundamental reference for antenna gain measurements"]
+                },
+                disadvantages: {
+                    ar: ["حجم فيزيائي كبير عند الترددات المنخفضة (LF/HF)", "نطاق ترددي ضيق نسبياً", "يتطلب موازنة الدفع (Balun) لمنع التيارات العكسية"], 
+                    en: ["Physically large at lower frequencies", "Relatively narrow operational bandwidth", "Requires a Balun for coaxial feed impedance matching"]
+                },
+                frequencies: ["mf", "hf", "vhf"], 
+                applications: ["amateur-radio", "broadcasting", "military-comms", "fm-broadcast"], 
+                polarization: ["linear"],
+                coveragePattern: ["omnidirectional"],
+                installationType: ["fixed-outdoor", "mobile-portable"]
+            },
+            {
+                name: {ar: "هوائي ثنائي القطب المطوي (Folded Dipole)", en: "Folded Dipole Antenna"},
+                id: "folded-dipole", 
+                image: "https://cdn.everythingrf.com/live/1642248372933_637778451711908692.png",
+                description: {
+                    ar: "هوائي ثنائي قطب مع طي أطرافه وتوصيلها في حلقة مغلقة. يوفر معاوقة إدخال مرتفعة (حوالي 300 أوم) ونطاق ترددي أوسع مقارنة بالثنائي العادي.", 
+                    en: "A dipole antenna with its ends folded back and connected together. Provides a higher input impedance (~300 ohms) and broader bandwidth."
+                },
+                advantages: {
+                    ar: ["معاوقة مرتفعة (300Ω) تتطابق بسهولة مع خطوط النقل الشريطية", "عرض نطاق ترددي تشغيلي أوسع مقارنة بالثنائي البسيط", "متانة ميكانيكية أعلى وهيكل حلقة مغلقة يقلل الضوضاء"], 
+                    en: ["High input impedance (300Ω) suitable for twin-lead feeds", "Broader bandwidth performance than standard dipole", "Mechanically robust closed-loop design with lower DC noise"]
+                },
+                disadvantages: {
+                    ar: ["يحتاج محول معاوقة (Balun 4:1) للربط بكوابل الكواكس 50Ω/75Ω", "استهلاك أعلى للمواد في التصنيع", "كسب إشعاعي مشابه للثنائي البسيط"], 
+                    en: ["Requires a 4:1 Balun transformer for 50/75Ω coaxial cables", "Slightly higher material cost in fabrication", "Radiation gain is identical to standard dipole"]
+                },
+                frequencies: ["vhf", "uhf"], 
+                applications: ["fm-broadcast", "two-way-radio", "tv-uhf"], 
+                polarization: ["linear"],
+                coveragePattern: ["omnidirectional", "directional"],
+                installationType: ["fixed-outdoor"]
+            },
+            {
+                name: {ar: "هوائي أحادي القطب (Vertical Monopole)", en: "Vertical Monopole Antenna"},
+                id: "monopole", 
+                image: "https://www.antennaexperts.co/resources/assets/uploads/post/2023-04-261945674.jpg",
+                description: {
+                    ar: "هوائي رأسي يعمل فوق سطح موصل (Ground Plane). ينشئ نمط إشعاع دائري متساوي (360 درجة) في المستوى الأفق، وهو خيار مثالي للشبكات الخلوية والمركبات.", 
+                    en: "A single vertical element operating over a conductive ground plane. Creates an omnidirectional pattern in the azimuth plane."
+                },
+                advantages: {
+                    ar: ["تغطية دائرية شاملة 360 درجة", "حجم مدمج وسهل التثبيت على السيارات والأبراج", "زاوية إشعاع منخفضة مناسبة للموجات الأرضية"], 
+                    en: ["Omnidirectional 360-degree coverage", "Compact and easy to mount on vehicles/masts", "Low elevation angle suited for ground-wave propagation"]
+                },
+                disadvantages: {
+                    ar: ["يعتمد أداؤه بشكل كلي على جودة الأرضي (Ground System)", "كسب إشعاعي أقل مقارنة بالهوائيات الاتجاهية", "عرضة لالتقاط الضوضاء الصناعية"], 
+                    en: ["Performance heavily relies on a solid ground plane", "Lower gain compared to directional arrays", "Susceptible to man-made RF noise"]
+                },
+                frequencies: ["lf", "mf", "hf", "vhf", "uhf"], 
+                applications: ["broadcasting", "maritime", "two-way-radio", "air-traffic-control", "cellular", "tv-uhf"],
+                polarization: ["linear"],
+                coveragePattern: ["omnidirectional"],
+                installationType: ["fixed-outdoor", "mobile-portable"]
+            },
+            {
+                name: {ar: "هوائي ياغي-أودا (Yagi-Uda)", en: "Yagi-Uda Directional Antenna"},
+                id: "yagi", 
+                image: "https://www.antennaexperts.co/resources/assets/uploads/post/2023-02-149912118.jpg",
+                description: {
+                    ar: "هوائي اتجاهي عالي الكسب يتكون من عنصر مُغذى (Driven Element) وعاكس (Reflector) وموجهات (Directors). ممتاز لربط نقطتين لمسافات طويلة.", 
+                    en: "A highly directional array antenna featuring a reflector and multiple directors. Excellent for long-range point-to-point communication."
+                },
+                advantages: {
+                    ar: ["كسب اتجاهي مرتفع جداً (High Gain)", "عزل ممتاز للإشارات القادمة من الخلف والجانبين", "تكلفة اقتصادية بالنسبة لمعدل الكسب"], 
+                    en: ["High gain and focused directivity", "Strong front-to-back isolation ratio", "Cost-effective solution for high-gain links"]
+                },
+                disadvantages: {
+                    ar: ["حجم فيزيائي ومقاومة عالية للرياح", "يحتاج لتوجيه ميكانيكي دقيق نحو الهدف", "نطاق ترددي محدد"], 
+                    en: ["Wind load sensitive due to physical boom structure", "Requires precise mechanical alignment", "Bandwidth is limited to resonant band"]
+                },
+                frequencies: ["vhf", "uhf"],
+                applications: ["broadcasting", "amateur-radio", "two-way-radio", "air-traffic-control", "tv-uhf"],
+                polarization: ["linear"],
+                coveragePattern: ["directional"],
+                installationType: ["fixed-outdoor"]
+            },
+            {
+                name: {ar: "هوائي البوق (Horn Antenna)", en: "Horn Antenna"},
+                id: "horn", 
+                image: "https://lxantenna.com/wp-content/uploads/2025/04/horn_antenna_a_key_component_in_modern_wireless_communication-1024x683.webp",
+                description: {
+                    ar: "هوائي على شكل بوق معدني متوسع يوجه أمواج الراديو من دليل الموجات (Waveguide) نحو الفضاء الكوني. يُستخدم في ترددات الميكروويف والأقمار الصناعية والمعايرة.", 
+                    en: "A flaring metal waveguide shaped like a horn. Used extensively at microwave frequencies for high directivity, low loss, and calibration standards."
+                },
+                advantages: {
+                    ar: ["توجيهية وكسب إشعاعي ممتاز مع تقليل الانعكاسات الداخليّة", "عرض نطاق ترددي تشغيلي واسع جداً", "فقد إشعاعي منخفض للغاية ونسبة SWR ممتازة"], 
+                    en: ["High directivity and gain with smooth impedance transition", "Extremely broad frequency operating range", "Low internal loss and excellent SWR matching"]
+                },
+                disadvantages: {
+                    ar: ["حجم ثقيل وهيكل معدني كبير في الترددات المنخفضة", "تكلفة تصنيع عالية لتشغيل المعادن بدقة", "غير مناسب للأجهزة الصغيرة والمحمولة"], 
+                    en: ["Physically heavy and bulky at lower microwave bands", "Higher manufacturing cost due to precision metal fabrication", "Not suitable for embedded or compact hand-held devices"]
+                },
+                frequencies: ["shf", "uhf"], 
+                applications: ["satellite", "wifi-bluetooth", "mmwave"], 
+                polarization: ["linear", "circular"],
+                coveragePattern: ["directional"],
+                installationType: ["fixed-outdoor"]
+            },
+            {
+                name: {ar: "هوائي الطبق المكافئ (Parabolic Dish)", en: "Parabolic Dish Antenna"},
+                id: "parabolic", 
+                image: "https://cenos-platform.com/wp-content/uploads/2024/08/cenos-simulation-software-parabolic-antenna.jpg",
+                description: {
+                    ar: "يستخدم عاكساً مكافئ الهندسة لتركيز موجات الراديو في حزمة ضيقة جداً ومكثفة. خيار رئيسي لاتصالات الأقمار الصناعية وروابط الميكروويف.", 
+                    en: "Uses a parabolic reflector to collimate RF energy into a narrow beam. Standard choice for satellite communications and microwave backhaul."
+                },
+                advantages: {
+                    ar: ["كسب إشعاعي فائق الارتفاع (Extreme Gain)", "حزمة مركزة جداً لتقليل التداخل", "مثالي للروابط بعيدة المدى عبر الأقمار والفضاء"], 
+                    en: ["Ultra-high gain capabilities", "Extremely narrow beamwidth minimizing noise", "Ideal for long-haul backhaul and satellite links"]
+                },
+                disadvantages: {
+                    ar: ["وزن ثقيل وتكلفة مرتفعة", "حساس جداً للاهتزازات والظروف الجوية", "يحتاج توجيهاً دقيقاً بالمليمتر"], 
+                    en: ["Heavy, expensive, and high wind resistance", "Requires rigid mounting and precise alignment", "Performance degrades under severe weather/rain fade"]
+                },
+                frequencies: ["uhf", "shf"],
+                applications: ["satellite", "wifi-bluetooth", "mmwave"], 
+                polarization: ["linear", "circular"],
+                coveragePattern: ["directional"],
+                installationType: ["fixed-outdoor"]
+            },
+            {
+                name: {ar: "هوائي الرقعة (Microstrip Patch)", en: "Microstrip Patch Antenna"},
+                id: "patch", 
+                image: "https://antennasimulator.com/wp-content/uploads/2025/08/Microstrip_Patch_Antenna.png",
+                description: {
+                    ar: "هوائي مسطح مطبوع على اللوحات الإلكترونية (PCB). يتميز بحجمه المدمج وإمكانية دمجه بسهولة داخل الهواتف وأجهزة IoT والسيارات.", 
+                    en: "A low-profile printed antenna fabricated directly on circuit boards. Ideal for embedded systems, mobile phones, and IoT."
+                },
+                advantages: {
+                    ar: ["حجم مدمج ووزن خفيف وارتفاع شبه معدوم", "رخيص الإنتاج بكميات ضخمة عبر تقنيات الـ PCB", "يمكن تصميمه للاستقطاب الدائري أو الخطي"], 
+                    en: ["Low-profile, lightweight, and flat integrated design", "Very low manufacturing cost in mass production", "Supports both linear and circular polarization"]
+                },
+                disadvantages: {
+                    ar: ["كفاءة إشعاعية وكسب أقل من الهوائيات السلكية", "نطاق ترددي ضيق جداً", "قدرة محدودة على تحمل الطاقات العالية"], 
+                    en: ["Lower efficiency and power handling capability", "Narrow impedance bandwidth", "Sensitive to substrate dielectric variations"]
+                },
+                frequencies: ["uhf", "shf"],
+                applications: ["gps", "cellular", "wifi-bluetooth", "mmwave"], 
+                polarization: ["linear", "circular"],
+                coveragePattern: ["omnidirectional", "directional"],
+                installationType: ["embedded"]
+            },
+            {
+                name: {ar: "هوائي حلزوني (Helical Antenna)", en: "Helical Antenna"},
+                id: "helical", 
+                image: "https://cdn.everythingrf.com/live/helical_antennas_1.jpg",
+                description: {
+                    ar: "هوائي موصل ملفوف حلزونياً. مصمم خصيصاً لتوليد استقطاب دائري ممتاز للتغلب على التغيرات الإشارية في اتصالات الأقمار والـ GPS.", 
+                    en: "A helical wire structure producing circular polarization. Widely used in satellite tracking and space systems to prevent polarization loss."
+                },
+                advantages: {
+                    ar: ["استقطاب دائري ممتاز ينفي خسائر Polarization Loss", "عرض نطاق ترددي واسع في وضع الحزمة (Axial Mode)", "أداء متفوق في استقبال إشارات الأقمار الصناعية"], 
+                    en: ["Excellent circular polarization (RHCP/LHCP)", "Broadband response in axial mode", "Resilient against multipath polarization fading"]
+                },
+                disadvantages: {
+                    ar: ["حجم بارز مادياً مقارنة بالهوائيات المسطحة", "تعقيد تصنيع في ضبط مسافات الحلزون", "كسب متوسط مقارنة بالمكافئ"], 
+                    en: ["Physically bulky compared to patch antennas", "Requires accurate helix pitch geometry", "Moderate gain relative to reflector antennas"]
+                },
+                frequencies: ["vhf", "uhf", "shf"],
+                applications: ["satellite", "gps", "amateur-radio"],
+                polarization: ["circular"],
+                coveragePattern: ["directional"],
+                installationType: ["fixed-outdoor", "mobile-portable"]
+            }
+        ];
+
+        // --- MAPPING FOR APPLICATION DROPDOWN ---
+        const frequencyAppMap = {
+            'lf': [{ value: 'maritime', arDisplay: 'ملاحة بحرية وإشارات منارات (Maritime)', enDisplay: 'Maritime Navigation & Beacons' }],
+            'mf': [{ value: 'broadcasting', arDisplay: 'بث أرضي AM وأمن الموانئ (AM Broadcast)', enDisplay: 'AM Terrestrial Broadcasting' }],
+            'hf': [
+                { value: 'amateur-radio', arDisplay: 'هواة الراديو للمسافات الطويلة (Shortwave)', enDisplay: 'Long-Distance Amateur Radio' },
+                { value: 'military-comms', arDisplay: 'اتصالات عسكرية ودبلوماسية عابرة للقارات', enDisplay: 'Intercontinental Military Comms' }
+            ],
+            'vhf': [
+                { value: 'two-way-radio', arDisplay: 'أنظمة الراديو ثنائية الاتجاه (PMR/Walkie)', enDisplay: 'Two-Way Land Mobile Radio' },
+                { value: 'fm-broadcast', arDisplay: 'بث راديو FM محلي', enDisplay: 'Local FM Radio Broadcast' },
+                { value: 'air-traffic-control', arDisplay: 'اتصالات مراقبة الطيران (ATC)', enDisplay: 'Air Traffic Control (ATC)' }
+            ],
+            'uhf': [
+                { value: 'cellular', arDisplay: 'شبكات خلوية 4G/5G وإنترنت الأشياء', enDisplay: 'Cellular Broadband (4G/5G/IoT)' },
+                { value: 'gps', arDisplay: 'نظام تحديد المواقع العالمي (GPS/GNSS)', enDisplay: 'Global Positioning System (GPS)' },
+                { value: 'tv-uhf', arDisplay: 'تلفزيون رقمي أرضي (DVB-T)', enDisplay: 'Digital Terrestrial TV' }
+            ],
+            'shf': [
+                { value: 'satellite', arDisplay: 'اتصالات الأقمار الصناعية (VSAT/DBS)', enDisplay: 'Satellite Links (VSAT/DBS)' },
+                { value: 'wifi-bluetooth', arDisplay: 'روابط الميكروويف و WiFi 5/6GHz', enDisplay: 'Microwave Backhaul & WiFi 6GHz' },
+                { value: 'mmwave', arDisplay: 'الموجات المليمترية ورادار المركبات', enDisplay: 'Millimeter Wave & Radar' }
+            ]
+        };
+
+        // DOM References
+        const findAntennaBtn = document.getElementById('findAntennaBtn');
+        const resultsDiv = document.getElementById('results');
+        const frequencySelect = document.getElementById('frequency');
+        const applicationSelect = document.getElementById('application');
+        const polarizationSelect = document.getElementById('polarization'); 
+        const coveragePatternSelect = document.getElementById('coveragePattern');
+        const installationTypeSelect = document.getElementById('installationType');
+
+        const analyzeInput = document.getElementById('projectAnalyzerInput');
+        const analyzeBtn = document.getElementById('analyzeProjectBtn');
+        const analyzeLoader = document.getElementById('analyzeLoader');
+        const analyzeFeedback = document.getElementById('analyzeFeedback');
+        const htmlEl = document.documentElement;
+
+        let currentLanguage = 'en'; 
+        let userCustomApiKey = localStorage.getItem('antenna_gemini_api_key') || "";
+
+        // API Helper Settings
+        function openApiKeyModal() { document.getElementById('apiKeyModal').classList.remove('hidden'); }
+        function closeApiKeyModal() { document.getElementById('apiKeyModal').classList.add('hidden'); }
+        function saveApiKey() {
+            const val = document.getElementById('customApiKeyInput').value.trim();
+            userCustomApiKey = val;
+            localStorage.setItem('antenna_gemini_api_key', val);
+            closeApiKeyModal();
+            alert('API Key updated successfully!');
+        }
+
+        // --- MARKDOWN TO DIGITAL STEP CARDS PARSER ---
+        function parseMarkdownToHtml(markdownText) {
+            if (!markdownText) return '';
+            
+            const lines = markdownText.split('\n');
+            let html = '<div class="space-y-3 my-3">';
+            let autoStepIndex = 0;
+
+            lines.forEach(line => {
+                let trimmed = line.trim();
+                if (!trimmed) return;
+
+                // Headings parsing (e.g. ### Title or ## Title)
+                if (trimmed.startsWith('#')) {
+                    const headingText = trimmed.replace(/^#+\s*/, '').replace(/\*\*/g, '');
+                    html += `<h5 class="text-xs font-black uppercase tracking-wider text-[#826099] pt-2 pb-1 border-b border-[#ebdacc] flex items-center gap-1.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                ${headingText}
+                             </h5>`;
+                    return;
+                }
+
+                const isNumbered = /^\d+[\.\)]\s*/.test(trimmed);
+                const isBullet = /^[\*\-\+]\s*/.test(trimmed);
+
+                if (isNumbered || isBullet) {
+                    autoStepIndex++;
+                    let content = trimmed.replace(/^(\d+[\.\)]|[\*\-\+])\s*/, '');
+                    
+                    // Format **bold text**
+                    content = content.replace(/\*\*(.*?)\*\*/g, '<strong class="font-extrabold text-gray-900">$1</strong>');
+                    
+                    const stepNumber = isNumbered ? (trimmed.match(/^\d+/)?.[0] || autoStepIndex) : autoStepIndex;
+
+                    html += `
+                        <div class="flex items-start gap-3 p-3.5 bg-gradient-to-r from-white to-[#fbfaf7] rounded-2xl border border-[#ebdacc] shadow-sm hover:border-[#826099]/40 transition duration-200">
+                            <div class="shrink-0 w-7 h-7 rounded-xl bg-[#826099] text-white font-black text-xs flex items-center justify-center shadow-sm">
+                                ${stepNumber}
+                            </div>
+                            <div class="text-xs text-gray-700 leading-relaxed pt-0.5 flex-1">
+                                ${content}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    let content = trimmed.replace(/\*\*(.*?)\*\*/g, '<strong class="font-extrabold text-[#826099]">$1</strong>');
+                    html += `<p class="text-xs text-gray-600 leading-relaxed px-1 my-1">${content}</p>`;
+                }
+            });
+
+            html += '</div>';
+            return html;
+        }
+
+        // --- Language State Sync ---
+        function setLanguage(lang) {
+            currentLanguage = translations[lang] ? lang : 'en'; 
+            const data = translations[currentLanguage];
+            const isRTL = currentLanguage === 'ar';
+
+            htmlEl.setAttribute('lang', currentLanguage);
+            htmlEl.setAttribute('dir', isRTL ? 'rtl' : 'ltr');
+            localStorage.setItem('userLanguage', currentLanguage);
+
+            document.querySelectorAll('[data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (data[key]) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        el.setAttribute('placeholder', data[key]);
+                    } else {
+                        el.textContent = data[key];
+                    }
+                }
+            });
+
+            document.getElementById('button-text-toggle').textContent = data.lang_toggle_btn;
+
+            updateFrequencyDropdown();
+            updatePolarizationDropdown();
+            updateCoverageDropdown();
+            updateInstallationDropdown();
+            updateApplicationDropdown(); 
+
+            handleFindAntennaClick();
+        }
+
+        function toggleLanguage() {
+            setLanguage(currentLanguage === 'ar' ? 'en' : 'ar');
+        }
+
+        // --- Dropdowns Fillers ---
+        function updateFrequencyDropdown() {
+            const data = translations[currentLanguage];
+            frequencySelect.innerHTML = '';
+            const options = [
+                { value: 'any', textKey: 'freq_option_any' },
+                { value: 'lf', textKey: 'freq_lf' },
+                { value: 'mf', textKey: 'freq_mf' },
+                { value: 'hf', textKey: 'freq_hf' },
+                { value: 'vhf', textKey: 'freq_vhf' },
+                { value: 'uhf', textKey: 'freq_uhf' },
+                { value: 'shf', textKey: 'freq_shf' },
+            ];
+            options.forEach(opt => frequencySelect.add(new Option(data[opt.textKey], opt.value)));
+        }
+
+        function updatePolarizationDropdown() {
+            const data = translations[currentLanguage];
+            polarizationSelect.innerHTML = '';
+            const options = [
+                { value: 'any', textKey: 'polarization_option_any' },
+                { value: 'linear', textKey: 'polarization_linear' },
+                { value: 'circular', textKey: 'polarization_circular' },
+            ];
+            options.forEach(opt => polarizationSelect.add(new Option(data[opt.textKey], opt.value)));
+        }
+
+        function updateCoverageDropdown() {
+            const data = translations[currentLanguage];
+            coveragePatternSelect.innerHTML = '';
+            const options = [
+                { value: 'any', textKey: 'coverage_option_any' },
+                { value: 'omnidirectional', textKey: 'coverage_omni' },
+                { value: 'directional', textKey: 'coverage_directional' },
+            ];
+            options.forEach(opt => coveragePatternSelect.add(new Option(data[opt.textKey], opt.value)));
+        }
+
+        function updateInstallationDropdown() {
+            const data = translations[currentLanguage];
+            installationTypeSelect.innerHTML = '';
+            const options = [
+                { value: 'any', textKey: 'installation_option_any' },
+                { value: 'fixed-outdoor', textKey: 'installation_fixed' },
+                { value: 'mobile-portable', textKey: 'installation_mobile' },
+                { value: 'embedded', textKey: 'installation_embedded' },
+            ];
+            options.forEach(opt => installationTypeSelect.add(new Option(data[opt.textKey], opt.value)));
+        }
+
+        function updateApplicationDropdown() {
+            const selectedFreq = frequencySelect.value;
+            applicationSelect.innerHTML = ''; 
+            const data = translations[currentLanguage];
+            const displayKey = currentLanguage === 'ar' ? 'arDisplay' : 'enDisplay';
+
+            if (selectedFreq === 'any') {
+                applicationSelect.disabled = true;
+                applicationSelect.add(new Option(data['app_option_select_first'], 'any'));
+            } else {
+                applicationSelect.disabled = false;
+                applicationSelect.add(new Option(data['app_option_any'], 'any'));
+                (frequencyAppMap[selectedFreq] || []).forEach(app => {
+                    applicationSelect.add(new Option(app[displayKey], app.value));
+                });
+            }
+        }
+        
+        frequencySelect.addEventListener('change', updateApplicationDropdown);
+
+        // --- Gemini Integration Logic ---
+        async function callGemini(prompt) {
+            const keyToUse = userCustomApiKey;
+            if (!keyToUse) {
+                // Fallback simulation mode formatted in Markdown steps
+                await new Promise(r => setTimeout(r, 1200));
+                return `### Official Installation & Setup Guide
+1. **Unboxing & Component Inspection**: Carefully check all antenna elements, coaxial line, and mounting brackets for physical integrity.
+2. **Structural & Mast Mounting**: Securely mount the antenna mast on a elevated structure, ensuring complete mechanical stability against wind loads.
+3. **Transmission Line & VSWR Tuning**: Connect low-loss 50-ohm feed cable. Measure and verify VSWR values are strictly below 1.5.
+4. **Alignment & Polarization Matching**: Point the main lobe precisely toward the target transceiver with proper polarization angle.
+5. **Electrical Safety Protocol**: Ensure grounding wire installation and keep safe distance from high-voltage electric lines.`;
+            }
+
+            try {
+                const modelName = "gemini-2.5-flash-preview-05-20";
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${keyToUse}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
+                const resData = await response.json();
+                return resData.candidates?.[0]?.content?.parts?.[0]?.text || "Unable to retrieve AI response.";
+            } catch(e) {
+                console.error("Gemini API Error:", e);
+                return "AI Service temporarily unavailable. Please verify your internet or API key.";
+            }
+        }
+
+        // --- AI Project Analyzer Event ---
+        async function handleAIAnalyzeClick() {
+            const projectDescription = analyzeInput.value.trim();
+            const data = translations[currentLanguage];
+            
+            if (!projectDescription) {
+                analyzeFeedback.textContent = data.analysis_enter_desc;
+                analyzeFeedback.classList.remove('hidden');
+                return;
+            }
+
+            analyzeBtn.disabled = true;
+            analyzeLoader.classList.remove('hidden');
+            analyzeLoader.classList.add('flex');
+            analyzeFeedback.classList.add('hidden');
+
+            setTimeout(() => {
+                let freq = 'uhf';
+                let cov = 'directional';
+                let inst = 'fixed-outdoor';
+
+                if (projectDescription.toLowerCase().includes('iot') || projectDescription.includes('مدمج')) {
+                    freq = 'uhf'; cov = 'omnidirectional'; inst = 'embedded';
+                } else if (projectDescription.toLowerCase().includes('satellite') || projectDescription.includes('قمر')) {
+                    freq = 'shf'; cov = 'directional'; inst = 'fixed-outdoor';
+                }
+
+                frequencySelect.value = freq;
+                updateApplicationDropdown();
+                coveragePatternSelect.value = cov;
+                installationTypeSelect.value = inst;
+
+                analyzeBtn.disabled = false;
+                analyzeLoader.classList.add('hidden');
+                analyzeLoader.classList.remove('flex');
+
+                analyzeFeedback.innerHTML = `
+                    <p class="text-[#826099] font-bold mb-1">${data.analysis_complete}</p>
+                    <div class="grid grid-cols-2 gap-2 mt-2">
+                        <div><strong>${data.analysis_label_freq}</strong> ${freq.toUpperCase()}</div>
+                        <div><strong>${data.analysis_label_coverage}</strong> ${cov}</div>
+                        <div><strong>${data.analysis_label_install}</strong> ${inst}</div>
+                    </div>
+                `;
+                analyzeFeedback.classList.remove('hidden');
+
+                handleFindAntennaClick();
+            }, 1000);
+        }
+
+        // --- AI Installation Guide Handler ---
+        async function handleAIGuideClick(event) {
+            const button = event.target.closest('.ai-guide-btn'); 
+            const antennaName = button.dataset.antennaNameEn;
+            const cardBody = button.closest('.antenna-card');
+            const contentDiv = cardBody.querySelector('.ai-guide-content');
+            const data = translations[currentLanguage];
+
+            if (contentDiv.style.display === 'block') {
+                contentDiv.style.display = 'none';
+                button.textContent = data.ai_guide_btn;
+                return;
+            }
+
+            button.disabled = true;
+            button.textContent = data.ai_guide_generating;
+
+            const prompt = `Provide a concise, numbered engineering installation guide and safety precautions for a ${antennaName} antenna. Return markdown numbered steps. Language: ${currentLanguage === 'ar' ? 'Arabic' : 'English'}.`;
+            const guideMarkdown = await callGemini(prompt);
+
+            const formattedHtml = parseMarkdownToHtml(guideMarkdown);
+
+            contentDiv.innerHTML = `<div class="p-4 bg-[#fbfaf7] rounded-2xl border border-[#ebdacc] text-xs text-gray-700 shadow-inner mt-4 fade-in">${formattedHtml}</div>`;
+            contentDiv.style.display = 'block';
+            button.textContent = data.ai_guide_btn_hide;
+            button.disabled = false;
+        }
+
+        // --- Main Filtering Logic ---
+        function handleFindAntennaClick() {
+            const selectedFreq = frequencySelect.value;
+            const selectedApp = applicationSelect.value;
+            const selectedPolarization = polarizationSelect.value; 
+            const selectedCoverage = coveragePatternSelect.value; 
+            const selectedInstallation = installationTypeSelect.value; 
+
+            let filtered = antennaData.filter(antenna => {
+                const freqMatch = selectedFreq === 'any' || antenna.frequencies.includes(selectedFreq);
+                const appMatch = selectedApp === 'any' || antenna.applications.includes(selectedApp);
+                const polMatch = selectedPolarization === 'any' || antenna.polarization.includes(selectedPolarization);
+                const covMatch = selectedCoverage === 'any' || antenna.coveragePattern.includes(selectedCoverage);
+                const instMatch = selectedInstallation === 'any' || antenna.installationType.includes(selectedInstallation);
+
+                return freqMatch && appMatch && polMatch && covMatch && instMatch;
+            });
+
+            displayResults(filtered.length > 0 ? filtered : antennaData.slice(0, 2), filtered.length === 0);
+        }
+
+        function displayResults(antennas, isFallback = false) {
+            resultsDiv.innerHTML = '';
+            const data = translations[currentLanguage];
+            const langCode = currentLanguage;
+
+            if (isFallback) {
+                const warnBox = document.createElement('div');
+                warnBox.className = 'mb-8 p-4 rounded-2xl bg-[#f4f2ef] border-l-4 border-[#edcfb6] text-xs font-semibold text-gray-700 fade-in';
+                warnBox.innerHTML = `<strong>${data.results_no_match_heading}:</strong> ${data.results_no_match_text}`;
+                resultsDiv.appendChild(warnBox);
+            }
+
+            const headerTitle = document.createElement('h3');
+            headerTitle.className = 'text-xl font-bold text-[#826099] mb-6 tracking-tight';
+            headerTitle.textContent = antennas.length > 1 ? data.results_title_multiple : data.results_title_single;
+            resultsDiv.appendChild(headerTitle);
+
+            antennas.forEach(antenna => {
+                const card = document.createElement('div');
+                card.className = 'antenna-card bg-white rounded-3xl shadow-sm border border-[#ebdacc] overflow-hidden mb-6 fade-in hover:shadow-md transition duration-300';
+                
+                const advItems = antenna.advantages[langCode].map(a => `<li class="flex items-start gap-2"><span class="text-teal-600 font-bold">✓</span><span>${a}</span></li>`).join('');
+                const disItems = antenna.disadvantages[langCode].map(d => `<li class="flex items-start gap-2"><span class="text-rose-500 font-bold">✕</span><span>${d}</span></li>`).join('');
+
+                card.innerHTML = `
+                    <div class="md:flex">
+                        <div class="md:w-1/3 bg-[#f4f2ef] p-6 flex items-center justify-center border-b md:border-b-0 md:border-r border-[#ebdacc]">
+                            <img class="w-full h-44 object-cover rounded-2xl shadow-sm" src="${antenna.image}" alt="${antenna.name.en}" onerror="this.src='https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=600&q=80';">
+                        </div>
+                        <div class="p-6 md:w-2/3 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <h4 class="text-xl font-extrabold text-[#826099]">${antenna.name[langCode]}</h4>
+                                    <span class="text-[10px] font-extrabold uppercase px-3 py-1 rounded-full bg-[#dfd7e8]/60 text-[#826099]">${antenna.id}</span>
+                                </div>
+                                <p class="text-xs text-gray-600 mb-4 leading-relaxed">${antenna.description[langCode]}</p>
+                                
+                                <div class="flex flex-wrap gap-2 mb-4">
+                                    <span class="px-2.5 py-1 rounded-lg bg-[#f4f2ef] border border-[#ebdacc] text-[10px] font-bold text-gray-700">Freq: ${antenna.frequencies.join(', ').toUpperCase()}</span>
+                                    <span class="px-2.5 py-1 rounded-lg bg-[#f4f2ef] border border-[#ebdacc] text-[10px] font-bold text-gray-700">Pol: ${antenna.polarization.join(', ')}</span>
+                                    <span class="px-2.5 py-1 rounded-lg bg-[#f4f2ef] border border-[#ebdacc] text-[10px] font-bold text-gray-700">Pattern: ${antenna.coveragePattern.join(', ')}</span>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs mb-4">
+                                    <div>
+                                        <span class="font-bold text-teal-700 block mb-1">${data.section_advantages}</span>
+                                        <ul class="space-y-1 text-gray-600">${advItems}</ul>
+                                    </div>
+                                    <div>
+                                        <span class="font-bold text-rose-600 block mb-1">${data.section_disadvantages}</span>
+                                        <ul class="space-y-1 text-gray-600">${disItems}</ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-4 border-t border-[#f4f2ef]">
+                                <button class="ai-guide-btn w-full py-2.5 px-4 rounded-xl bg-[#826099] hover:bg-[#6b4c7d] text-white font-extrabold text-xs transition shadow-sm active:scale-95" data-antenna-name-en="${antenna.name.en}">
+                                    ${data.ai_guide_btn}
+                                </button>
+                                <div class="ai-guide-content hidden"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                resultsDiv.appendChild(card);
+            });
+
+            document.querySelectorAll('.ai-guide-btn').forEach(btn => btn.addEventListener('click', handleAIGuideClick));
+        }
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            analyzeBtn.addEventListener('click', handleAIAnalyzeClick);
+            findAntennaBtn.addEventListener('click', handleFindAntennaClick);
+            
+            const savedLang = localStorage.getItem('userLanguage') || 'en';
+            setLanguage(savedLang);
+        });
+    </script>
+</body>
+</html>
