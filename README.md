@@ -186,8 +186,7 @@ The complete project documentation is available in the **docs** folder.
 ## 📜 License
 
 This project was developed for educational and academic purposes.
-
-You may replace this section with the **MIT License** or another open-source license before publishing.
+No license has been specified at this time.
 
 ---
 
