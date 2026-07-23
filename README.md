@@ -183,6 +183,14 @@ The complete project documentation is available in the **docs** folder.
 
 ---
 
+## 🛠️ Quality Assurance & Debugging
+
+We follow evidence-based debugging practices to ensure dynamic component stability, graceful network fallbacks, and multi-language alignment.
+
+* For complete issue analysis, reproduction steps, split diagnoses, and before/after visual proofs, check our **[Debugging & Investigation Board](DEBUGGING_PACKET.md)**[cite: 3].
+* For the full engineering methodology and detailed test scenarios, view the **[QA Bug Report (PDF)](Document%209.pdf)**[cite: 3].
+
+---
 ## 📜 License
 
 This project was developed for educational and academic purposes.
