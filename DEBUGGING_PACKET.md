@@ -71,3 +71,20 @@ We investigated 5 major UI and functional issues in the Antenna Recommender appl
 | **TC-QA-03** | Resize browser window below 768px | Mobile view and card grids resize properly[cite: 3] | **PASS**[cite: 3] |
 | **TC-QA-04** | Click "Get AI Installation Guide" | AI guide displays as clean, formatted step cards[cite: 3] | **PASS**[cite: 3] |
 | **TC-QA-05** | Submit conflicting filter search | Clear warning message and fallback antennas appear[cite: 3] | **PASS**[cite: 3] |
+
+### Visual Proof (Before & After)
+
+#### 1. Issue 3: AI Installation Guide Formatting
+| Before Fix (Raw Markdown) | After Fix (Formatted Step Cards) |
+| :---: | :---: |
+| ![Before AI Guide](before-ai-guide.png) | ![After AI Guide](after-ai-guide.png) |
+
+#### 2. Issue 5: Language Alignment (RTL/LTR)
+| Before Fix (Shifted Layout) | After Fix (Aligned RTL Layout) |
+| :---: | :---: |
+| ![Before Translation](before-translation.png) | ![After Translation](after-translation.png) |
+
+#### 3. Issue 4: Zero Match Search Feedback
+| Before Fix (Blank Screen) | After Fix (Fallback Notice Card) |
+| :---: | :---: |
+| ![Before Zero Match](before-zero-match.png) | ![After Zero Match](after-zero-match.png) |
