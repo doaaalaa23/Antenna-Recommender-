@@ -77,14 +77,14 @@ We investigated 5 major UI and functional issues in the Antenna Recommender appl
 #### 1. Issue 3: AI Installation Guide Formatting
 | Before Fix (Raw Markdown) | After Fix (Formatted Step Cards) |
 | :---: | :---: |
-| ![Before AI Guide](before-ai-guide.png) | ![After AI Guide](after-ai-guide.png) |
+| ![Before AI Guide](./screenshots/before-ai-guide.png) | ![After AI Guide](./screenshots/after-ai-guide.png) |
 
 #### 2. Issue 5: Language Alignment (RTL/LTR)
 | Before Fix (Shifted Layout) | After Fix (Aligned RTL Layout) |
 | :---: | :---: |
-| ![Before Translation](before-translation.png) | ![After Translation](after-translation.png) |
+| ![Before Translation](./screenshots/before-translation.png) | ![After Translation](./screenshots/after-translation.png) |
 
 #### 3. Issue 4: Zero Match Search Feedback
 | Before Fix (Blank Screen) | After Fix (Fallback Notice Card) |
 | :---: | :---: |
-| ![Before Zero Match](before-zero-match.png) | ![After Zero Match](after-zero-match.png) |
+| ![Before Zero Match](./screenshots/before-zero-match.png) | ![After Zero Match](./screenshots/after-zero-match.png) |
