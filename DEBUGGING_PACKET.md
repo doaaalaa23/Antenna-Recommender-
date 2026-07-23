@@ -1,7 +1,7 @@
 # Debugging & Investigation Board
 
 ## Project Information
-* **Project Name:** Antenna Recommender System
+* **Project Name:** Antenna Recommender
 * **Report Date:** July 23, 2026
 * **Status:** Resolved / Verified
 
