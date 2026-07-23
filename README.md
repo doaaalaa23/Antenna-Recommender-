@@ -105,10 +105,10 @@ Built around five delivery epics: system architecture & data modeling, core reco
 
 ## Documentation
 
-- [Project Brief](docs/Project_Brief.pdf)
-- [Business Requirements Document](docs/BRD.pdf)
-- [Product Requirements Document](docs/PRD.pdf)
-- [Action Plan](docs/Action_Plan.docx)
+- [Project Brief](docs/AR_Project_Brief.pdf)
+- [Business Requirements Document](docs/AR_BRD.pdf)
+- [Product Requirements Document](docs/AR_PRD.pdf)
+- [Action Plan](docs/Action_Plan.pdf)
 
 ## Team
 
