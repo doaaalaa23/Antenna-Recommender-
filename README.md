@@ -190,7 +190,7 @@ The complete project documentation is available in the **docs** folder.
 We follow evidence-based debugging practices to ensure dynamic component stability, graceful network fallbacks, and multi-language alignment.
 
 * For complete issue analysis, reproduction steps, split diagnoses, and before/after visual proofs, check our **[Debugging & Investigation Board](DEBUGGING_PACKET.md)**.
-* For the full engineering methodology and detailed test scenarios, view the **[QA Bug Report (PDF)](docs/Action_Plan.pdf)**.
+* For the full engineering methodology and detailed test scenarios, view the **[QA Bug Report (PDF)](docs/QA_Bug_Report.pdf)**.
 
 ---
 ## 📜 License
