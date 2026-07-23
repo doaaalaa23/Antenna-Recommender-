@@ -1,124 +1,200 @@
-# Antenna Recommender
+# 📡 Antenna Recommender
 
-**Your smart guide to optimal antenna selection.**
-
-A responsive, AI-assisted web application that helps students, RF engineers, and researchers choose the right antenna for their technical requirements — no login, no specialist expertise required.
+> **An AI-powered bilingual web application that helps students, RF engineers, and researchers select the most suitable antenna based on technical requirements using an intelligent recommendation engine and Google Gemini AI.**
 
 ![Homepage](screenshots/homepage.jpg)
 
+![Status](https://img.shields.io/badge/Status-Completed-success)
+![AI](https://img.shields.io/badge/AI-Google%20Gemini-blue)
+![Responsive](https://img.shields.io/badge/Responsive-Yes-brightgreen)
+![Languages](https://img.shields.io/badge/Languages-English%20%7C%20Arabic-orange)
+
 ---
 
-## The Problem
+## 📖 Overview
 
-Antenna selection depends on several interacting technical parameters (frequency, gain, application, beamwidth, and more). Existing reference material is scattered across textbooks, datasheets, and vendor sites, and interpreting it correctly requires a level of RF expertise many students and early-career engineers don't yet have.
+Selecting the right antenna requires evaluating multiple RF parameters such as frequency, gain, polarization, radiation pattern, and application type. Finding the best option often requires consulting textbooks, manufacturer datasheets, and technical references.
 
-## The Solution
+**Antenna Recommender** simplifies this process by allowing users to enter their project requirements—or simply describe their project in natural language—and receive intelligent antenna recommendations, alternative options, technical comparisons, and AI-generated installation guidance.
 
-Antenna Recommender takes a user's technical inputs and runs them through a recommendation engine — decision-tree / lookup-table logic validated by Subject Matter Experts — and returns a primary recommendation, at least one alternative, and a full side-by-side comparison. The whole flow takes three steps and works in both English and Arabic.
+---
 
-## Features
+## ✨ Features
 
-- **Technical Parameter Input** — frequency, application type, required gain, polarization, coverage pattern, and installation type, with input validation.
-- **AI Project Analyzer** — describe your project in plain language and Gemini AI extracts the technical filters for you.
-- **Intelligent Recommendation Engine** — multi-parameter filtering with a dynamic fallback to general-purpose antennas (e.g. Dipole/Monopole) when there's no direct match.
-- **Antenna Comparison** — side-by-side table covering gain, beamwidth, polarization, size, and cost.
-- **Characteristics & Radiation Patterns** — interactive polar plots and physical characteristics for every recommendation.
-- **AI Installation Guide Generator** — step-by-step, safety-noted installation instructions, auto-translated to Arabic.
-- **Bilingual / RTL Support** — instant English ⇄ Arabic switching with automatic layout direction.
-- **Fully Responsive** — works across Chrome, Firefox, and Edge on desktop, tablet, and mobile.
+### 🎯 Intelligent Recommendation Engine
 
-| Input & Recommendation | Antenna Results & Comparison |
-|---|---|
-| ![Recommendation form](screenshots/recommendation-form.png) | ![Antenna results](screenshots/antenna-results.jpg) |
+* Multi-parameter antenna filtering
+* Frequency, gain, polarization, and coverage matching
+* Alternative recommendations when no exact match exists
+* Fast and accurate recommendation process
 
-## Tech Stack
+### 🤖 AI Project Analyzer
 
-- **Frontend:** HTML, JavaScript, Tailwind CSS
-- **AI Integration:** Google Gemini API (structured project analysis + installation guide generation)
-- **Data Layer:** Single source-of-truth `antennaData` array (Dipole, Monopole, Yagi-Uda, Parabolic Dish, Patch Microstrip, Loop, Helical) with mapped RF parameters
-- **i18n:** Custom bilingual switcher (English / Arabic, LTR / RTL)
+* Describe your project in plain language
+* Google Gemini extracts the required technical parameters automatically
+* No RF expertise required
 
-## Getting Started
+### 📊 Antenna Comparison
+
+Compare recommended antennas side-by-side, including:
+
+* Gain
+* Frequency range
+* Beamwidth
+* Polarization
+* Size
+* Cost
+
+### 📡 Radiation Patterns
+
+* Interactive radiation pattern visualization
+* Physical characteristics
+* Technical specifications
+
+### 🛠 AI Installation Guide
+
+Automatically generates:
+
+* Installation steps
+* Safety recommendations
+* Best practices
+
+Available in both **English** and **Arabic**.
+
+### 🌍 Bilingual Support
+
+* English & Arabic
+* RTL/LTR layout switching
+* Responsive across desktop, tablet, and mobile devices
+
+---
+
+## 📸 Application Preview
+
+| Recommendation Form                                         | Recommendation Results                                     |
+| ----------------------------------------------------------- | ---------------------------------------------------------- |
+| ![Recommendation Form](screenshots/recommendation-form.png) | ![Recommendation Results](screenshots/antenna-results.jpg) |
+
+---
+
+## 🛠 Technology Stack
+
+| Category                  | Technologies                           |
+| ------------------------- | -------------------------------------- |
+| **Frontend**              | HTML5, JavaScript (ES6), Tailwind CSS  |
+| **AI Integration**        | Google Gemini API                      |
+| **Recommendation Engine** | Custom rule-based filtering            |
+| **Data Layer**            | `antennaData` (Single Source of Truth) |
+| **Internationalization**  | English / Arabic with RTL support      |
+
+### Supported Antenna Types
+
+* Dipole
+* Monopole
+* Yagi-Uda
+* Parabolic Dish
+* Patch Microstrip
+* Loop
+* Helical
+
+---
+
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- A modern browser (Chrome, Firefox, or Edge)
-- A [Gemini API key](https://ai.google.dev/) for the AI Analyzer and Installation Guide features
+* Google Chrome, Firefox, or Microsoft Edge
+* Google Gemini API Key
 
 ### Installation
 
 ```bash
-git clone https://github.com/<your-org>/antenna-recommender.git
+git clone https://github.com/<your-username>/antenna-recommender.git
+
 cd antenna-recommender
 ```
 
-Create a `.env` file (or your environment's equivalent) and add your Gemini API key:
+Create a `.env` file:
 
+```env
+GEMINI_API_KEY=YOUR_API_KEY
 ```
-GEMINI_API_KEY=your_api_key_here
-```
 
-> ⚠️ Never commit your API key. `.env` is included in `.gitignore`.
+> ⚠️ Never commit your API key to GitHub.
 
-Then open `index.html` in your browser, or serve the folder locally:
+Run locally:
 
 ```bash
 npx serve .
 ```
 
-## Project Structure
+Or simply open `index.html` in your browser.
 
-```
+---
+
+## 📂 Project Structure
+
+```text
 antenna-recommender/
+│
 ├── index.html
-├── /src
-│   ├── data/           # antennaData source of truth
-│   ├── engine/          # filterAntennas() recommendation logic
-│   ├── ai/              # Gemini integration (analyzer + installation guide)
-│   ├── i18n/            # language + RTL/LTR handling
-│   └── ui/               # components, result cards, comparison table
-├── /docs
-│   ├── Project_Brief.pdf
-│   ├── BRD.pdf
-│   ├── PRD.pdf
-│   └── Action_Plan.docx
+├── src/
+│   ├── ai/
+│   ├── data/
+│   ├── engine/
+│   ├── i18n/
+│   └── ui/
+│
+├── screenshots/
+│
+├── docs/
+│   ├── AR_Project_Brief.pdf
+│   ├── AR_BRD.pdf
+│   ├── AR_PRD.pdf
+│   └── Action_Plan.pdf
+│
 └── README.md
 ```
 
-*(Adjust paths above to match your actual repo layout.)*
+---
 
-## Requirements at a Glance
+## 📄 Documentation
 
-| Metric | Target |
-|---|---|
-| Recommendation accuracy | ≥ 95% (validated against SME benchmarking) |
-| Response time | < 3 seconds under normal load |
-| Task completion rate | ≥ 90% in usability testing |
-| Steps to result | ≤ 3 |
-| Browser support | Chrome, Firefox, Edge — fully responsive |
+The complete project documentation is available in the **docs** folder.
 
-## Roadmap / Status
+* 📘 Project Brief
+* 📗 Business Requirements Document (BRD)
+* 📙 Product Requirements Document (PRD)
+* 📕 Action Plan
 
-Built around five delivery epics: system architecture & data modeling, core recommendation logic, responsive multilingual UI, Gemini AI integration, and QA/optimization. See `/docs/Action_Plan.docx` for the full task breakdown and acceptance criteria.
+---
 
-**Out of scope (v1):** physical antenna testing/fabrication, real-time external database integration, user accounts & login.
+## 👥 Team
 
-## Documentation
+| Name                 | Role            |
+| -------------------- | --------------- |
+| **Nourin Elshenawi** | Project Manager |
+| **Doaa Alaaelden**   | Team Member     |
+| **Rowan Mohamed**    | Team Member     |
+| **Marina Essam**     | Team Member     |
 
-- [Project Brief](docs/AR_Project_Brief.pdf)
-- [Business Requirements Document](docs/AR_BRD.pdf)
-- [Product Requirements Document](docs/AR_PRD.pdf)
-- [Action Plan](docs/Action_Plan.pdf)
+**Academic Sponsor:**
+**Dr. Randa Fouad**
 
-## Team
+---
 
-- Doaa Alaaelden
-- Nourin Elshenawi — Project Manager
-- Rowan Mohamed
-- Marina Essam
+## 📜 License
 
-**Sponsor:** Dr. Randa Fouad
+This project was developed for educational and academic purposes.
 
-## License
+You may replace this section with the **MIT License** or another open-source license before publishing.
 
-Add your license here (e.g. MIT).
+---
+
+<div align="center">
+
+### ⭐ If you found this project interesting, consider giving it a star!
+
+**Built with ❤️ using HTML, JavaScript, Tailwind CSS, and Google Gemini AI**
+
+</div>
